@@ -10,6 +10,6 @@ namespace movieapplication.Model
         public string ProducerName { get; set; }
         public DateTime DateofRelease { get; set; }
 
-        public ICollection<Actor> Actors { get; set; }
+        public ICollection<MovieActorId> MoviesActorIds { get; set; }
     }
 }

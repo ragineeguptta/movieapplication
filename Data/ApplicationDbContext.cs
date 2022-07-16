@@ -16,12 +16,16 @@ namespace movieapplication.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<MovieActorId>().HasKey(pc => new { pc.MovieId, pc.ActorId });
             modelBuilder.Entity<MovieActorId>()
-                .HasOne(p => p.Movie)
-                .WithMany(pc => pc.MoviesActorIds)
-                .HasForeignKey(pc => pc.ActorId);
-
+                .HasKey(bc => new { bc.ActorId, bc.MovieId });
+            modelBuilder.Entity<MovieActorId>()
+                .HasOne(bc => bc.Actor)
+                .WithMany(b => b.MoviesActorIds)
+                .HasForeignKey(bc => bc.ActorId);
+            modelBuilder.Entity<MovieActorId>()
+                .HasOne(bc => bc.Movie)
+                .WithMany(c => c.MoviesActorIds)
+                .HasForeignKey(bc => bc.MovieId);
         }
     }
 }

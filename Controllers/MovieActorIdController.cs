@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using movieapplication.Data;
@@ -11,57 +15,125 @@ namespace movieapplication.Controllers
     public class MovieActorIdController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        public MovieActorIdController(ApplicationDbContext context) => _context = context;
 
+        public MovieActorIdController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
+        // GET: api/MovieActorId
         [HttpGet]
-        public async Task<IEnumerable<MovieActorId>> Get()
-            => await _context.MoviesActorIds.ToListAsync();
-
-        [HttpGet("id")]
-        [ProducesResponseType(typeof(MovieActorId), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetByMovieActorIdId(int id)
+        public async Task<ActionResult<IEnumerable<MovieActorId>>> GetMoviesActorIds()
         {
-            var movieactorid = await _context.MoviesActorIds.FindAsync(id);
-            return movieactorid == null ? NotFound() : Ok(movieactorid);
+          if (_context.MoviesActorIds == null)
+          {
+              return NotFound();
+          }
+
+            return await _context.MoviesActorIds.ToListAsync();
         }
 
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<IActionResult> Create(MovieActorId movieactorid)
+        // GET: api/MovieActorId/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<MovieActorId>> GetMovieActorId(int id)
         {
-            await _context.MoviesActorIds.AddAsync(movieactorid);
-            await _context.SaveChangesAsync();
+          if (_context.MoviesActorIds == null)
+          {
+              return NotFound();
+          }
+            var movieActorId = await _context.MoviesActorIds.FindAsync(id);
 
-            return CreatedAtAction(nameof(GetByMovieActorIdId), new { id = movieactorid.Id }, movieactorid);
+            if (movieActorId == null)
+            {
+                return NotFound();
+            }
+
+            return movieActorId;
         }
 
+        // PUT: api/MovieActorId/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, MovieActorId movieactorid)
+        public async Task<IActionResult> PutMovieActorId(int id, MovieActorId movieActorId)
         {
-            if (id != movieactorid.Id) return BadRequest();
+            if (id != movieActorId.ActorId)
+            {
+                return BadRequest();
+            }
 
-            _context.Entry(movieactorid).State = EntityState.Modified;
+            _context.Entry(movieActorId).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!MovieActorIdExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/MovieActorId
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<MovieActorId>> PostMovieActorId(MovieActorId movieActorId)
+        {
+          if (_context.MoviesActorIds == null)
+          {
+              return Problem("Entity set 'ApplicationDbContext.MoviesActorIds'  is null.");
+          }
+            _context.MoviesActorIds.Add(movieActorId);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (MovieActorIdExists(movieActorId.ActorId))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return CreatedAtAction("GetMovieActorId", new { id = movieActorId.ActorId }, movieActorId);
+        }
+
+        // DELETE: api/MovieActorId/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteMovieActorId(int id)
+        {
+            if (_context.MoviesActorIds == null)
+            {
+                return NotFound();
+            }
+            var movieActorId = await _context.MoviesActorIds.FindAsync(id);
+            if (movieActorId == null)
+            {
+                return NotFound();
+            }
+
+            _context.MoviesActorIds.Remove(movieActorId);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        [HttpDelete("{id}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(int id)
+        private bool MovieActorIdExists(int id)
         {
-            var MovieActorIdToDelete = await _context.MoviesActorIds.FindAsync(id);
-            if (MovieActorIdToDelete == null) return NotFound();
-
-            _context.MoviesActorIds.Remove(MovieActorIdToDelete);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            return (_context.MoviesActorIds?.Any(e => e.ActorId == id)).GetValueOrDefault();
         }
     }
 }

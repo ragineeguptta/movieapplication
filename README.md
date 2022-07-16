@@ -1,5 +1,5 @@
 # movieapplication
-1. The core objects of this application are
+## The core objects of this application are
    Movie
    Actor
    Producer

@@ -15,16 +15,26 @@ namespace movieapplication.Controllers
 
 
         [HttpGet]
-        public async Task<IEnumerable<Actor>> Get()
-            => await _context.Actors.ToListAsync();
+        public async Task<IActionResult> Get()
+        {
+            var data = _context.Actors.Include(x => x.MoviesActorIds).ThenInclude(x => x.Movie)
+                .Select(x => new
+                {
+                    id = x.ActorId,
+                    actorName = x.ActorName,
+                    movies = x.MoviesActorIds.Select(k => k.Movie.MovieName).ToList()
+                });
+            return data == null ? NotFound() : Ok(data);
+        }
 
-        [HttpGet("id")]
+            [HttpGet("id")]
         [ProducesResponseType(typeof(Actor), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetByActorId(int id)
         {
             var actor = await _context.Actors.FindAsync(id);
             return actor == null ? NotFound() : Ok(actor);
+
         }
 
         [HttpPost]

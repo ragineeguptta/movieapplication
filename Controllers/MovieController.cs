@@ -15,8 +15,18 @@ namespace movieapplication.Controllers
 
 
         [HttpGet]
-        public async Task<IEnumerable<Movie>> Get()
-            => await _context.Movies.ToListAsync();
+        public async Task<IActionResult> Get()
+        {
+            var data = _context.Movies.Include(x => x.MoviesActorIds).ThenInclude(x => x.Actor)
+                .Select(x => new
+                {
+                    id = x.MovieId,
+                    actorName = x.MovieName,
+                    producerName = x.ProducerName,
+                    movies = x.MoviesActorIds.Select(k => k.Actor.ActorName).ToList()
+                });
+            return data == null ? NotFound() : Ok(data);
+        }
 
         [HttpGet("id")]
         [ProducesResponseType(typeof(Movie), StatusCodes.Status200OK)]

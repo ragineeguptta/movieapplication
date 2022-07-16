@@ -1,12 +1,16 @@
 # movieapplication
+## Software and languages uses-
+  ### Visual Studio 2021
+  ### EntityframeworkCore
+  ### .Net Core Web API (6.0 version)
 ## The core objects of this application are
-   Movie
-   Actor
-   Producer
+   ### Movie
+   ### Actor
+   ### Producer
    
-2. Create A 3 tables
-  a. Movies
-  b. Actors
-  c. MovisActorsId
+## Create A 3 tables
+  ### Movies
+  ### Actors
+  ### MovisActorsId
   
-3. Get, Add, Update, Delete is Done for all tables
+## Get, Add, Update, Delete is Done for all tables
